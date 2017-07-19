@@ -7,7 +7,7 @@ from pcl_helper import *
 # Define functions as required
 def vox_downsample(pcl_cloud):
     vox = pcl_cloud.make_voxel_grid_filter()
-    LEAF_SIZE = 0.002
+    LEAF_SIZE = 0.0042
     vox.set_leaf_size(LEAF_SIZE, LEAF_SIZE, LEAF_SIZE)
     cloud_filtered = vox.filter()
 
@@ -17,12 +17,19 @@ def passthrough_filter(pcl_cloud):
     passthrough = pcl_cloud.make_passthrough_filter()
     filter_axis = 'z'
     passthrough.set_filter_field_name(filter_axis)
-    axis_min = 0.6
+    axis_min = 0.8
     axis_max = 1.1
     passthrough.set_filter_limits(axis_min, axis_max)
     cloud_filtered = passthrough.filter()
+    passthrough = cloud_filtered..make_passthrough_filter()
+    filter_axis = 'y'
+    passthrough.set_filter_field_name(filter_axis)
+    axis_min = -2.75
+    axis_max = -1
+    passthrough.set_filter_limits(axis_min, axis_max)
+    cloud_filteredy = passthrough.filter()
     
-    return cloud_filtered
+    return cloud_filteredy
 
 def ransac_segmentation(pcl_cloud):
     seg = pcl_cloud.make_segmenter()
@@ -48,9 +55,9 @@ def euclid_cluster(pcl_cloud):
     white_cloud = XYZRGB_to_XYZ(pcl_cloud) # Apply function to convert XYZRGB to XYZ
     tree = white_cloud.make_kdtree()
     ec = white_cloud.make_EuclideanClusterExtraction()
-    ec.set_ClusterTolerance(0.001)
-    ec.set_MinClusterSize(10)
-    ec.set_MaxClusterSize(250)
+    ec.set_ClusterTolerance(0.01)
+    ec.set_MinClusterSize(600)
+    ec.set_MaxClusterSize(2500)
     ec.set_SearchMethod(tree)
     cluster_indices = ec.Extract()
 
